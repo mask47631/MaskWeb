@@ -1,11 +1,16 @@
 <template>
-  <div>
-    <h1>Hello World 页面</h1>
-    <HelloWorld msg="You did it!" />
+  <div class="helloView">
+    (⊙_☉)???
   </div>
 </template>
 
 <script setup>
-import HelloWorld from '../components/HelloWorld.vue'
 </script>
 
+<style scoped>
+.helloView {
+  margin: auto;
+  text-align: center;
+  font-size: 4rem;
+}
+</style>

@@ -1,13 +1,31 @@
 <script setup>
 import IndexHeader from "@/components/header/IndexHeader.vue";
-import { isPartition } from "@/js/common.js";
-import { onMounted, onUnmounted, computed } from "vue";
+import { isPartition,partitionWidth } from "@/js/common.js";
+import {onMounted, onUnmounted, computed, ref} from "vue";
 import { useRoute } from "vue-router";
 import Index from "@/components/left/index.vue";
 
+const rightStyle = ref({});
+const leftStyle = ref({});
+
 function checkPartition() {
   const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-  isPartition.value = window.innerWidth > 50 * rem;
+  isPartition.value = window.innerWidth > partitionWidth.value * rem;
+  if (isPartition.value){
+    rightStyle.value = {}
+    leftStyle.value = {}
+  }else {
+    rightStyle.value = {
+      'position': 'absolute',
+      'top': 0,
+      'left': 0,
+      'width': '100%'
+    }
+      leftStyle.value = {
+        'width': '100%',
+        'min-width': '30rem'
+    }
+  }
 }
 
 onMounted(() => {
@@ -31,10 +49,10 @@ const rightIndexClass = computed(() => {
     <IndexHeader />
   </header>
   <main>
-    <div id="left-index">
+    <div id="left-index" :style="leftStyle">
       <index/>
     </div>
-    <div id="right-index" :class="rightIndexClass">
+    <div id="right-index" :class="rightIndexClass" :style="rightStyle">
       <router-view />
     </div>
   </main>
@@ -42,9 +60,4 @@ const rightIndexClass = computed(() => {
 
 <style scoped>
 
-.logo {
-  display: block;
-  width: 7rem;
-  height: 7rem;
-}
 </style>
