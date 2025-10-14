@@ -10,6 +10,7 @@ html, body {
 }
 * {
     box-sizing: border-box;
+
 }
 #app{
     height: 100%;
@@ -29,11 +30,13 @@ main {
     width: 100%;
     display: flex;
     position: relative;
+    min-height: 0;
 }
 #left-index, #right-index{
     height: 100%;
     overflow: auto;
     display: flex;
+    min-height: 0;
 }
 #left-index{
     width: 30rem;
@@ -57,4 +60,31 @@ input{
     font-size: 1.5rem;
     border-radius: 1rem;
     border: none;
+}
+.menu-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    button{
+        margin-bottom: 0.5rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+}
+.setting-div{
+    display: flex;
+    height: 3rem;
+    margin-bottom: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    .setting-div-text{
+        font-size: 1.5rem;
+        margin: auto;
+        white-space: nowrap;
+    }
+    input{
+        flex: 1;
+        margin-left: 0.5rem;
+        text-align: center;
+    }
 }

@@ -18,31 +18,5 @@ top_title.value = '设置'
 </template>
 
 <style scoped>
-.menu-view {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  button{
-    margin-bottom: 0.5rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-  }
-}
-.setting-div{
-  display: flex;
-  height: 3rem;
-  margin-bottom: 0.5rem;
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-  .setting-div-text{
-    font-size: 1.5rem;
-    margin: auto;
-    white-space: nowrap;
-  }
-  input{
-    flex: 1;
-    margin-left: 0.5rem;
-    text-align: center;
-  }
-}
+
 </style>
