@@ -3,6 +3,7 @@ import {computed, reactive} from "vue";
 import {top_title} from "@/js/common.js";
 import {usingServer} from "@/js/server.js";
 import ChatMsgTextCard from "@/components/chat/ChatMsgTextCard.vue";
+import ChatMsgFileCard from "@/components/chat/ChatMsgFileCard.vue";
 
 const props = defineProps({
   data: {
@@ -53,20 +54,22 @@ if (!props.data.content || !props.data.content.type){
 <template>
 <div class="chat-card-view">
   <div class="chat-card-tx">
-    <img :src="data.fromAvatar" alt="" v-if="usingServer.value.userInfo.id !== data.fromId"/>
+    <img :src="usingServer.value.baseURL+'/file/private/'+data.fromAvatar+'/'+usingServer.value.token" alt="" v-if="usingServer.value.userInfo.id !== data.fromId"/>
   </div>
   <div class="chat-card-nr">
     <div class="chat-card-username" :style="usingServer.value.userInfo.id === data.fromId?{
-      'text-align': 'right',
-      'margin-left': 'auto',
-      'margin-right': '0.5rem'
+      // 'text-align': 'right',
+      // 'margin-left': 'auto',
+      // 'margin-right': '0.5rem'
+      'margin-left': '0.5rem'
     }:{
       'margin-left': '0.5rem'
     }">
       {{ data.fromName }}
     </div>
-    <div class="chat-card-text">
+    <div class="chat-card-text" :style="''">
       <ChatMsgTextCard v-if="data.content.type === 'text'" :data="data.content"/>
+      <ChatMsgFileCard v-if="data.content.type === 'file'" :data="data.content"/>
     </div>
     <div class="chat-card-divider">
       <div class="divider"></div>
@@ -75,7 +78,7 @@ if (!props.data.content || !props.data.content.type){
 
   </div>
   <div class="chat-card-tx">
-    <img :src="data.fromAvatar" alt="" v-if="usingServer.value.userInfo.id === data.fromId"/>
+    <img :src="usingServer.value.baseURL+'/file/private/'+data.fromAvatar+'/'+usingServer.value.token" alt="" v-if="usingServer.value.userInfo.id === data.fromId"/>
   </div>
 </div>
 </template>
@@ -88,6 +91,10 @@ if (!props.data.content || !props.data.content.type){
 .chat-card-tx{
   width: 4rem;
   min-height: 4rem;
+  img{
+    max-width: 100%;
+    max-height: 100%;
+  }
 }
 .chat-card-nr{
   flex: 1;
@@ -114,5 +121,7 @@ if (!props.data.content || !props.data.content.type){
   flex: 1;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+  min-width: 0;
+  min-height: 0;
 }
 </style>

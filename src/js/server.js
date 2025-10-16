@@ -1,4 +1,4 @@
-import {reactive, ref, watch} from "vue";
+import {nextTick, reactive, ref, watch} from "vue";
 import {ApiClient} from "@/js/api.js";
 import SockJS from "sockjs-client/dist/sockjs.min.js";
 import Stomp from "stompjs";
@@ -13,16 +13,16 @@ function loadFromLocalStorage() {
         try {
             const parsedServers = JSON.parse(savedServers);
             serverList.value = parsedServers.map(server => 
-                new Server(server.img, server.title, server.description, server.timestamp, server.baseURL, server.newChatMsg, server.token)
+                new Server(server.img, server.title, server.description, server.timestamp, server.baseURL, server.newChatMsg, server.token,server.watchId)
             );
         } catch (e) {
             console.error('解析localStorage中的serverList失败:', e);
             // 如果解析失败，使用默认数据
-            initializeDefaultServers();
+            // initializeDefaultServers();
         }
     } else {
         // 如果localStorage中没有数据，使用默认数据
-        initializeDefaultServers();
+        // initializeDefaultServers();
     }
 }
 
@@ -46,7 +46,8 @@ function saveToLocalStorage() {
             timestamp: server.timestamp,
             baseURL: server.baseURL,
             newChatMsg: server.newChatMsg || '',
-            token: server.token || ''
+            token: server.token || '',
+            watchId: server.watchId
         }));
         localStorage.setItem('serverList', JSON.stringify(serializedData));
     } catch (e) {
@@ -60,7 +61,7 @@ watch(serverList, saveToLocalStorage, { deep: true });
 
 
 export class Server {
-    constructor(img, title, description, timestamp, baseURL, newChatMsg = '', token = '') {
+    constructor(img, title, description, timestamp, baseURL, newChatMsg = '', token = '',watchId = 0) {
         this.img = img;
         this.title = title;
         this.description = description;
@@ -68,14 +69,16 @@ export class Server {
         this.baseURL = baseURL;
         this.apiClient = new ApiClient(baseURL);
         this.newChatMsg = newChatMsg;
+        this.watchId = watchId
         this.chatList = []
         this.token = token;
         this.stompClient = null;
         this.connected = false;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
-        this.reconnectDelay = 3000;
+        this.reconnectDelay = 10000;
         this.isconnerting = false
+        this.newMagCount = 0
         // 如果提供了token，则设置到apiClient中
         if (token&&token.length>0) {
             this.apiClient.setToken(token);
@@ -86,6 +89,23 @@ export class Server {
         this.apiClient.setSocketToken = (token)=>{
             this.token = token
         }
+
+    }
+
+    async initServer() {
+        if (this.connected){
+             return
+        }
+        let info = await this.getVersion();
+        if (!info){
+            return
+        }
+        info = await this.apiClient.getSelf()
+        if (!info || !info.success){
+            return
+        }
+        this.userInfo = info.data
+        this.buildStompClient()
     }
     
     addServer() {
@@ -95,6 +115,9 @@ export class Server {
     }
 
     deleteServer() {
+        if(this.connected){
+            this.disconnect()
+        }
         serverList.value.splice(serverList.value.indexOf(this), 1);
     }
 
@@ -140,9 +163,44 @@ export class Server {
         
         // 将Map的值转换为数组，并按id排序
         this.chatList = Array.from(uniqueMessages.values()).sort((a, b) => a.id - b.id);
+        if (this.chatList.length>0){
+            let content = this.chatList[this.chatList.length-1].content
+            try {
+                content = JSON.parse(content);
+                if (!content.type){
+                    content = {
+                        type: 'text',
+                        text: JSON.stringify(content)
+                    }
+                }
+            }catch (e){
+                console.log(e);
+                content = {
+                    type: 'text',
+                    text: content
+                }
+            }
+            if (content.type=='text'){
+                this.newChatMsg = this.chatList[this.chatList.length-1].fromName+':'+content.text
+            }else {
+                this.newChatMsg = this.chatList[this.chatList.length-1].fromName+':'+'['+content.type+']'
+            }
+            this.timestamp = this.chatList[this.chatList.length-1].timestamp
+            if (usingServer.value === this){
+                this.watchId = this.chatList[this.chatList.length-1].id
+            }
+            this.newMagCount = this.chatList[this.chatList.length-1].id-this.watchId
+            if (this.newMagCount<0){
+                this.newMagCount = 0
+            }
+        }
+
     }
 
     buildStompClient () {
+        if (this.isconnerting){
+             return
+        }
         this.isconnerting =  true
         // 如果已经连接，先断开连接
         if (this.stompClient && this.connected) {
@@ -193,6 +251,11 @@ export class Server {
             // 尝试重连
             this.handleReconnect();
         });
+    }
+
+    disconnect() {
+        this.reconnectAttempts = this.maxReconnectAttempts
+        this.stompClient.disconnect();
     }
     
     handleReconnect() {

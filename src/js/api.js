@@ -179,6 +179,21 @@ class ApiClient {
     });
   }
 
+  /**
+   * 修改当前用户的信息
+   * @param {Object} userData - 用户信息数据
+   * @returns {Promise} 修改结果
+   */
+  updateSelf(userData) {
+    return this.request('/user/updateSelf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
+  }
+
   // ========== 系统配置接口 ==========
 
   /**
@@ -199,7 +214,10 @@ class ApiClient {
   saveConfig(configData) {
     return this.request('/config/save', {
       method: 'POST',
-      body: JSON.stringify(configData)
+      body: JSON.stringify(configData),
+        headers: {
+          'Content-Type': 'application/json'
+        }
     });
   }
 

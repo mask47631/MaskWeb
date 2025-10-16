@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router';
 import ServerCard from "@/components/left/ServerCard.vue";
 import {serverList, usingServer} from "@/js/server.js";
+import {nextTick} from "vue";
 
 const router = useRouter();
 
@@ -15,11 +16,25 @@ function serverListClick(item) {
   }
 }
 
+function deleteServer(server) {
+  server.deleteServer();
+  usingServer.value = null;
+  setTimeout(()=>{
+    router.push('/');
+  },100)
+}
+
 </script>
 
 <template>
 <div class="server-index">
-  <ServerCard v-for="(item, index) in serverList" :key="index" :data="item" @click="serverListClick(item)"/>
+  <ServerCard 
+    v-for="(item, index) in serverList" 
+    :key="index" 
+    :data="item" 
+    @click="serverListClick(item)"
+    @delete="deleteServer"
+  />
 </div>
 <!--<button @click="navigateToWelcome">跳转到 Welcome</button>-->
 </template>

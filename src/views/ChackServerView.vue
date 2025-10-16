@@ -9,13 +9,14 @@ const msg = ref("获取服务器信息")
 top_title.value = '检测'
 function stompCliented (){
   if (usingServer.value.connected){
+    usingServer.value.StompCliented = function (){}
     router.push('/chatServer');
   }else {
     msg.value = "服务连接失败"
   }
 }
 onMounted(async () => {
-  var info = await usingServer.value.getVersion()
+  let info = await usingServer.value.getVersion();
   if (!info){
     msg.value = "获取服务器信息失败"
     return

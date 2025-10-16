@@ -8,10 +8,21 @@ import IconSetting from "@/components/icons/IconSetting.vue";
 const router = useRouter();
 
 const handleIconLeftClick = () => {
+  if (router.currentRoute.value.name === 'ServerMenu') {
+    router.push('/chatServer');
+    return
+  }
   top_title.value = '会话列表';
   router.push('/');
 };
-
+const handleTextClick = () => {
+  if (router.currentRoute.value.name === 'ChatServer') {
+    router.push('/serverMenu');
+  }
+  if (router.currentRoute.value.name === 'ServerMenu'){
+    router.push('/chatServer')
+  }
+};
 </script>
 
 <template>
@@ -19,7 +30,7 @@ const handleIconLeftClick = () => {
   <div class="index-header-left" >
     <IconLeft width="100%" height="100%" v-if="!isPartition && $route.path !== '/'" @click="handleIconLeftClick"/>
   </div>
-  <div class="index-header-text">{{top_title}}</div>
+  <div @click="handleTextClick" class="index-header-text">{{top_title}}</div>
   <div class="index-header-right">
     <IconSetting width="100%" height="100%" @click="router.push('/menu')"/>
   </div>

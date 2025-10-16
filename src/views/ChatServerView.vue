@@ -6,9 +6,13 @@ import IconAdd from "@/components/icons/IconAdd.vue";
 import IconSend from "@/components/icons/IconSend.vue";
 import ServerCard from "@/components/left/ServerCard.vue";
 import { ref, onMounted, nextTick, watch } from 'vue';
+import {useRouter} from "vue-router";
+const router = useRouter();
 
 top_title.value = usingServer.value.title
-
+if (!usingServer.value){
+  router.push('/');
+}
 // 获取 textarea 元素的引用
 const textareaRef = ref(null);
 const chatListViewRef = ref(null);
@@ -38,17 +42,7 @@ const content = ref('');
 const handleFileUpload = async (event) => {
   const files = event.target.files;
   if (files.length === 0) return;
-  let filetype = 'media'
   let fileList = []
-  // 检查所有文件是否都是图片、视频或音频
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    if (!isValidMediaType(file)) {
-      // alert('请选择图片、视频或音频文件！');
-      filetype =  'file'
-      return;
-    }
-  }
 
   // 处理有效的文件上传
   for (let i = 0; i < files.length; i++) {
@@ -57,27 +51,19 @@ const handleFileUpload = async (event) => {
     console.log('上传文件:', file.name);
     // 例如，可以将文件信息发送到服务器或添加到聊天记录中
     const res = await usingServer.value.apiClient.uploadFile(file)
-    if (res){
-      fileList.push(res)
+    if (res && res.success){
+      fileList.push(res.data)
     }
   }
   usingServer.value.sendMessage(JSON.stringify({
     text: fileList,
-    type: filetype
+    type: 'file'
   }));
 
   // 清空文件输入框
   if (fileInputRef.value) {
     fileInputRef.value.value = '';
   }
-};
-
-// 验证文件是否为图片、视频或音频
-const isValidMediaType = (file) => {
-  const allowedTypes = ['image/', 'video/', 'audio/'];
-  const fileType = file.type;
-  
-  return allowedTypes.some(type => fileType.startsWith(type));
 };
 
 // 触发文件选择
@@ -116,7 +102,12 @@ const scrollToBottom = () => {
     }
   });
 };
-
+try {
+  usingServer.value.watchId = usingServer.value.chatList[usingServer.value.chatList.length-1].id
+  usingServer.value.newMagCount = 0
+}catch ( e){
+  console.log( e)
+}
 // 监听 chatList 长度变化
 watch(
   () => usingServer.value.chatList.length,
@@ -127,6 +118,7 @@ watch(
 
 // 组件挂载后初始化 textarea 高度
 onMounted(() => {
+
   const textarea = document.getElementById('message-input');
   const chatListView = document.querySelector('.chat-list-view');
   

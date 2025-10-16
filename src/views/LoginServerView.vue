@@ -24,11 +24,11 @@ async function stompCliented() {
   if (username.value == '' || email.value == '' || password.value == ''){
     return
   }
-  const info = await usingServer.value.apiClient.register(username.value, email.value, password.value)
+  const info = await usingServer.value.apiClient.register(username.value, password.value, email.value)
   console.log( info)
   if (info && info.success){
     usingServer.value.setToken(info.data.token)
-    router.push('/chatServer');
+    router.push('/chackServer');
   }
 }
 </script>

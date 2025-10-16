@@ -1,20 +1,24 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import HelloWorld from '../views/HelloWorld.vue'
 import MenuView from "@/views/MenuView.vue";
 import ChackServerView from "@/views/ChackServerView.vue";
 import LoginServerView from "@/views/LoginServerView.vue";
 import ChatServerView from "@/views/ChatServerView.vue";
+import ServerMenuView from "@/views/ServerMenuView.vue";
+import AddServerView from "@/views/AddServerView.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: HelloWorld },
     { path: '/menu', name: 'Menu', component: MenuView },
     { path: '/chackServer', name: 'ChackServer', component: ChackServerView },
     { path: '/loginServer', name: 'LoginServer', component: LoginServerView },
-    { path: '/chatServer', name: 'ChatServer', component: ChatServerView }
+    { path: '/chatServer', name: 'ChatServer', component: ChatServerView },
+    { path: '/serverMenu', name: 'ServerMenu', component: ServerMenuView },
+    { path: '/addServer', name: 'AddServer', component: AddServerView }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 })
 
