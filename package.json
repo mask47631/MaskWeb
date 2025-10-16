@@ -1,6 +1,6 @@
 {
   "name": "maskweb",
-  "version": "V1.0.0",
+  "version": "V0.1.0",
   "private": true,
   "type": "module",
   "engines": {

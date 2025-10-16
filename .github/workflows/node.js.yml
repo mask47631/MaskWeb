@@ -1,31 +1,54 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Node.js CI
-
-on:
-  push:
-    tags:
-      - "v*"
-  workflow_dispatch: # 允许手动触发该工作流
+name: 打包发布到Releases
 
 jobs:
   build:
-
+    name: 打包工作
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+      - name: 克隆代码
+        uses: actions/checkout@v4
+        with:
+          ref: main # 指定主分支
+
+      - name: 指定Node.js版本
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 安装依赖
+        run: npm install
+
+      - name: 打包插件
+        run: npm run build
+
+      - name: 创建谷歌浏览器扩展zip文件
+        run: zip -r ./dist.zip ./dist
+
+      - name: 创建serverless模版zip文件
+        run: |
+          zip -r ./template.zip ./template
+
+      - name: 获取新版本号
+        id: get_chrome_extension_version
+        run: |
+          # 尝试从 package.json 中获取版本号
+          VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "v0.0.1")
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "New version:${VERSION}"
+
+      - name: 创建Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.MY_TOKEN }}
+          tag_name: ${{ env.VERSION }}
+          name: v${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            ./dist.zip
+            ./template.zip
