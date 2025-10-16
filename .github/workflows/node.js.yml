@@ -47,7 +47,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.VERSION }}
-          name: v${{ env.VERSION }}
+          name: ${{ env.VERSION }}
           draft: false
           prerelease: false
           files: ./dist.zip
@@ -58,7 +58,7 @@ jobs:
           git init
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b gh-pages
+          git checkout -b pages
           git add .
           git commit -m "自动部署: 来自 ${{ github.repository }} 的构建产物 ${{ env.VERSION }}"
           git push --force https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git pages
