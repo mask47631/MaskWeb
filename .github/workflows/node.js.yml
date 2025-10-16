@@ -51,3 +51,14 @@ jobs:
           draft: false
           prerelease: false
           files: ./dist.zip
+
+      - name: 推送dist到另一个分支
+        run: |          
+          cd dist
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add .
+          git commit -m "自动部署: 来自 ${{ github.repository }} 的构建产物 ${{ env.VERSION }}"
+          git push --force https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git pages
