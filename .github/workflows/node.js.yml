@@ -34,10 +34,6 @@ jobs:
       - name: 创建谷歌浏览器扩展zip文件
         run: zip -r ./dist.zip ./dist
 
-      - name: 创建serverless模版zip文件
-        run: |
-          zip -r ./template.zip ./template
-
       - name: 获取新版本号
         id: get_chrome_extension_version
         run: |
@@ -55,6 +51,4 @@ jobs:
           name: v${{ env.VERSION }}
           draft: false
           prerelease: false
-          files: |
-            ./dist.zip
-            ./template.zip
+          files: ./dist.zip
