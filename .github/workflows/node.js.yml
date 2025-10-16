@@ -3,6 +3,12 @@
 
 name: 打包发布到Releases
 
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: # 允许手动触发该工作流
+  
 jobs:
   build:
     name: 打包工作
