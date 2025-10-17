@@ -1,19 +1,23 @@
 <script setup>
 
 import {top_title} from "@/js/common.js";
-import {ref} from "vue";
+import {getCurrentInstance, ref} from "vue";
 import {usingServer} from "@/js/server.js";
 import {useRouter} from "vue-router";
 const router = useRouter();
 const email = ref('')
 const password = ref('')
 const username = ref('')
+const instance = getCurrentInstance()
+
 top_title.value = usingServer.value.title+'[登录]'
 async function login() {
   if (email.value == '' || password.value == ''){
     return
   }
+  instance.appContext.config.globalProperties.$loading.show('登录中...')
   const info = await usingServer.value.apiClient.login(email.value, password.value)
+  instance.appContext.config.globalProperties.$loading.hide()
   console.log( info)
   if (info && info.success){
     usingServer.value.setToken(info.data.token)
@@ -24,7 +28,9 @@ async function stompCliented() {
   if (username.value == '' || email.value == '' || password.value == ''){
     return
   }
+  instance.appContext.config.globalProperties.$loading.show('注册中...')
   const info = await usingServer.value.apiClient.register(username.value, password.value, email.value)
+  instance.appContext.config.globalProperties.$loading.hide()
   console.log( info)
   if (info && info.success){
     usingServer.value.setToken(info.data.token)

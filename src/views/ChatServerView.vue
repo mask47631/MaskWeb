@@ -5,7 +5,7 @@ import {serverList, usingServer} from "@/js/server.js";
 import IconAdd from "@/components/icons/IconAdd.vue";
 import IconSend from "@/components/icons/IconSend.vue";
 import ServerCard from "@/components/left/ServerCard.vue";
-import { ref, onMounted, nextTick, watch } from 'vue';
+import {ref, onMounted, nextTick, watch, getCurrentInstance} from 'vue';
 import {useRouter} from "vue-router";
 const router = useRouter();
 
@@ -17,6 +17,32 @@ if (!usingServer.value){
 const textareaRef = ref(null);
 const chatListViewRef = ref(null);
 const fileInputRef = ref(null);
+
+// 添加键盘事件处理函数
+const handleKeydown = (event) => {
+  // 如果按下的是 Ctrl+Enter，则插入换行符
+  if (event.ctrlKey && event.key === 'Enter') {
+    event.preventDefault();
+    const textarea = event.target;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    
+    // 在光标位置插入换行符
+    textarea.value = text.substring(0, start) + '\n' + text.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + 1;
+    
+    // 触发输入事件以调整高度
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    return;
+  }
+  
+  // 如果按下的是 Enter 且没有按住 Ctrl，则发送消息
+  if (event.key === 'Enter' && !event.ctrlKey) {
+    event.preventDefault();
+    sendMessage();
+  }
+};
 
 // 自动调整 textarea 高度
 const adjustTextareaHeight = () => {
@@ -37,7 +63,7 @@ const adjustTextareaHeight = () => {
   }
 };
 const content = ref('');
-
+const instance = getCurrentInstance()
 // 文件上传处理
 const handleFileUpload = async (event) => {
   const files = event.target.files;
@@ -50,7 +76,9 @@ const handleFileUpload = async (event) => {
     // 这里可以添加文件上传逻辑
     console.log('上传文件:', file.name);
     // 例如，可以将文件信息发送到服务器或添加到聊天记录中
+    instance.appContext.config.globalProperties.$loading.show('正在上传('+(i+1)+'/'+files.length+')')
     const res = await usingServer.value.apiClient.uploadFile(file)
+    instance.appContext.config.globalProperties.$loading.hide()
     if (res && res.success){
       fileList.push(res.data)
     }
@@ -126,6 +154,8 @@ onMounted(() => {
     textareaRef.value = textarea;
     // 监听输入事件以自动调整高度
     textarea.addEventListener('input', adjustTextareaHeight);
+    // 添加键盘事件监听器
+    textarea.addEventListener('keydown', handleKeydown);
     // 初始化高度为单行
     textarea.style.height = '1.5rem';
   }
@@ -137,6 +167,15 @@ onMounted(() => {
   // 初始滚动到底部
   scrollToBottom();
 });
+
+// 清理事件监听器
+// onUnmounted(() => {
+//   if (textareaRef.value) {
+//     textareaRef.value.removeEventListener('input', adjustTextareaHeight);
+//     textareaRef.value.removeEventListener('keydown', handleKeydown);
+//   }
+// });
+
 </script>
 
 <template>
@@ -155,7 +194,13 @@ onMounted(() => {
   </div>
   <div class="chat-input-view">
     <IconAdd class="chat-input-btn" @click="triggerFileSelect"/>
-    <textarea v-model="content" class="mo-textarea" id="message-input" ref="textareaRef"/>
+    <textarea 
+      v-model="content" 
+      class="mo-textarea" 
+      id="message-input" 
+      ref="textareaRef"
+      @keydown="handleKeydown"
+    />
     <IconSend class="chat-input-btn" @click="sendMessage"/>
   </div>
 </div>

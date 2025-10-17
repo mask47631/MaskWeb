@@ -2,13 +2,14 @@
 
 import {Server, serverList} from "@/js/server.js";
 import {top_title} from "@/js/common.js";
-import {ref} from "vue";
+import {getCurrentInstance, ref} from "vue";
 import {useRouter} from "vue-router";
 top_title.value = '添加服务器'
 const serverUrl = ref('')
 const msg = ref("")
 const router = useRouter();
 const canAdd = ref(true)
+const instance = getCurrentInstance()
 const addServer = async () => {
   canAdd.value = false
   msg.value = ''
@@ -23,8 +24,10 @@ const addServer = async () => {
       return
     }
   }
+  instance.appContext.config.globalProperties.$loading.show('获取服务器信息...')
   const server = new Server('', '未命名', '', 0,serverUrl.value)
   let info = await server.getVersion()
+  instance.appContext.config.globalProperties.$loading.hide()
   if (!info){
     canAdd.value = true
     msg.value = "获取服务器信息失败"

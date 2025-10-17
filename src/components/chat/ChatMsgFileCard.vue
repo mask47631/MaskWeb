@@ -1,6 +1,7 @@
 <script setup>
 import {usingServer} from "@/js/server.js";
-import ChatCard from "@/components/chat/ChatCard.vue";
+import { ref } from 'vue';
+import ImageViewer from '@/components/ImageViewer.vue';
 
 const props = defineProps({
   data: {
@@ -14,6 +15,9 @@ const props = defineProps({
 for (let i = 0; i < props.data.text.length; i++){
   props.data.text[i].url = usingServer.value.baseURL+'/file/private/'+props.data.text[i].id+'/'+usingServer.value.token
 }
+
+const imageViewerVisible = ref(false);
+const currentImageUrl = ref('');
 
 function formatFileSize(bytes) {
   if (bytes === 0) return '0 Bytes';
@@ -51,11 +55,16 @@ function downloadFile(item) {
       document.body.removeChild(link);
     });
 }
+
+const showImagePreview = (url) => {
+  currentImageUrl.value = url;
+  imageViewerVisible.value = true;
+};
 </script>
 
 <template>
 <div class="chat-mag-file" v-for="(item, index) in data.text" :key="index">
-  <img v-if="item.contentType && item.contentType.startsWith('image')" :src="item.url" alt="">
+  <img v-if="item.contentType && item.contentType.startsWith('image')" :src="item.url" alt="" @click="showImagePreview(item.url)">
   <video v-else-if="item.contentType && item.contentType.startsWith('video')" controls>
     <source :src="item.url" :type="item.contentType">
   </video>
@@ -70,6 +79,13 @@ function downloadFile(item) {
     <button class="download-btn" @click="downloadFile(item)">下载</button>
   </div>
 </div>
+
+<ImageViewer 
+  :image-url="currentImageUrl"
+  :visible="imageViewerVisible"
+  @close="imageViewerVisible = false"
+  @update:visible="imageViewerVisible = $event"
+/>
 </template>
 
 <style scoped>
@@ -79,6 +95,10 @@ function downloadFile(item) {
     max-width: 100%;
     max-height: 20rem;
     margin-bottom: 0.2rem;
+  }
+  
+  img {
+    cursor: pointer;
   }
 }
 

@@ -171,11 +171,13 @@ onMounted(() => {
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-width: 0;
 }
 .server-card-right{
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-width: 0;
 }
 .server-card-right-top{
   flex: 1;
@@ -185,11 +187,15 @@ onMounted(() => {
   flex: 1;
   overflow: hidden;
   color: #999999;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 .server-card-but{
   flex: 1;
   overflow: hidden;
   display: flex;
+  min-width: 0;
 }
 .server-card-but-count{
   min-width: 2rem;
