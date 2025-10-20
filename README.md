@@ -15,6 +15,6 @@ npm run dev
 
 ### Compile and Minify for Production
 
-```sh
-npm run build
+```
+node build.js -v 1.0.0
 ```
