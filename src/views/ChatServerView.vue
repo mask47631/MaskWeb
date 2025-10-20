@@ -175,7 +175,22 @@ onMounted(() => {
 //     textareaRef.value.removeEventListener('keydown', handleKeydown);
 //   }
 // });
-
+const haveHistory = ref(true)
+const gethistory = async () => {
+  instance.appContext.config.globalProperties.$loading.show('获取历史记录')
+  const info = await usingServer.value.getHistory()
+  instance.appContext.config.globalProperties.$loading.hide()
+  if (info && info.length>0){
+    haveHistory.value = true
+  }else {
+    haveHistory.value = false
+  }
+  nextTick(() => {
+    if (chatListViewRef.value) {
+      chatListViewRef.value.scrollTop = 0;
+    }
+  });
+}
 </script>
 
 <template>
@@ -189,7 +204,8 @@ onMounted(() => {
     @change="handleFileUpload"
   >
   <div class="chat-list-view" ref="chatListViewRef">
-    <ChatCard v-for="(item, index) in usingServer.value.chatList" :key="index" :data="item"></ChatCard>
+    <button @click="gethistory" v-if="usingServer.value.chatList.length > 0 && haveHistory">获取历史</button>
+    <ChatCard v-for="(item, index) in usingServer.value.chatList" :key="item.id" :data="item"></ChatCard>
     <div v-if="usingServer.value.chatList.length<=0" class="chat-list-null">|･ω･｀)</div>
   </div>
   <div class="chat-input-view">

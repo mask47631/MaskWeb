@@ -149,6 +149,9 @@ const changeServerName =async () => {
       <button @click="changeServerName">修改</button>
     </div>
     <button v-if="usingServer.value.userInfo.role === 'admin'" @click="changeServerAvatar">修改服务头像</button>
+    <div v-if="usingServer.value.userInfo.role === 'admin'" class="setting-div">
+      <div class="setting-div-text">服务器版本：{{usingServer.value.version}}</div>
+    </div>
     <button @click="logout" style="background: red;color: white">登出</button>
   </div>
 </template>

@@ -1,10 +1,11 @@
-import {nextTick, reactive, ref, watch} from "vue";
+import {getCurrentInstance, nextTick, reactive, ref, watch} from "vue";
 import {ApiClient} from "@/js/api.js";
 import SockJS from "sockjs-client/dist/sockjs.min.js";
 import Stomp from "stompjs";
 export const serverList = ref([]);
 
 export const usingServer = reactive({value:null});
+const instance = getCurrentInstance()
 
 // 从localStorage恢复数据
 function loadFromLocalStorage() {
@@ -79,6 +80,7 @@ export class Server {
         this.reconnectDelay = 10000;
         this.isconnerting = false
         this.newMagCount = 0
+        this.version = ''
         // 如果提供了token，则设置到apiClient中
         if (token&&token.length>0) {
             this.apiClient.setToken(token);
@@ -134,6 +136,7 @@ export class Server {
             this.title = info.data.name;
             this.description = info.data.description;
             this.img = info.data.avatarUrl;
+            this.version = info.data.version;
             return true
         }else {
             return false
@@ -275,7 +278,17 @@ export class Server {
         }
     }
 
-
+    async getHistory(){
+        const info = await this.apiClient.getMessagesBeforeId(this.chatList[0].id)
+        let list = []
+        if (info && info.success && info.data.length>0){
+            this.chatList.unshift(...info.data)
+            // 对chatList进行排序和去重
+            this.sortAndDeduplicateChatList();
+            list = info.data
+        }
+        return list
+    }
 
      sendMessage(content) {
         if (!this.connected) {
