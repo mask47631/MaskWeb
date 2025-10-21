@@ -10,18 +10,12 @@ const msg = ref("")
 const router = useRouter();
 const canAdd = ref(true)
 const instance = getCurrentInstance()
-const addServer = async () => {
-  canAdd.value = false
-  msg.value = ''
-  if (!serverUrl.value || serverUrl.value === '') {
-    canAdd.value = true
-    return;
-  }
+const chackAddServer = async () => {
   for (let i = 0; i < serverList.value.length; i++){
     if (serverList.value[i].baseURL === serverUrl.value){
       canAdd.value = true
       msg.value = "服务器已存在"
-      return
+      return false
     }
   }
   instance.appContext.config.globalProperties.$loading.show('获取服务器信息...')
@@ -31,11 +25,34 @@ const addServer = async () => {
   if (!info){
     canAdd.value = true
     msg.value = "获取服务器信息失败"
-    return
+    return false
   }
   server.addServer()
   router.push('/')
+  return  true
 }
+const addServer = async () => {
+  canAdd.value = false
+  msg.value = ''
+  if (!serverUrl.value || serverUrl.value === '') {
+    canAdd.value = true
+    return;
+  }
+  // 如果serverUrl.value以/结尾，则删除/
+  if (serverUrl.value.endsWith('/')) {
+    serverUrl.value = serverUrl.value.slice(0, -1);
+  }
+  let ok = await chackAddServer()
+  if (!ok && !serverUrl.value.startsWith('http')) {
+    serverUrl.value = 'http://' + serverUrl.value
+    ok = await chackAddServer()
+  }
+  if (!ok && !serverUrl.value.startsWith('https')) {
+    serverUrl.value ='https://'+ serverUrl.value.slice(7, serverUrl.value.length)
+    await chackAddServer()
+  }
+}
+
 </script>
 
 <template>
