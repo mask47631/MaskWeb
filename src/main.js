@@ -21,5 +21,18 @@ app.use(router)
 // 安装全局loading组件
 app.use(GlobalLoading)
 
+// 注册service worker以启用PWA功能
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
 // 挂载应用
 app.mount('#app')
