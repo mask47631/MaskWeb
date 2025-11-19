@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HelloWorld from '../views/HelloWorld.vue'
+import HelloWorld from "@/views/HelloWorld.vue";
 import MenuView from "@/views/MenuView.vue";
 import ChackServerView from "@/views/ChackServerView.vue";
 import LoginServerView from "@/views/LoginServerView.vue";
@@ -7,6 +7,7 @@ import ChatServerView from "@/views/ChatServerView.vue";
 import ServerMenuView from "@/views/ServerMenuView.vue";
 import AddServerView from "@/views/AddServerView.vue";
 import StringToUnicodeView from "@/views/StringToUnicodeView.vue";
+import CacheSettingsView from "@/views/CacheSettingsView.vue";
 
 const routes = [
     { path: '/', name: 'Home', component: HelloWorld },
@@ -16,7 +17,8 @@ const routes = [
     { path: '/chatServer', name: 'ChatServer', component: ChatServerView },
     { path: '/serverMenu', name: 'ServerMenu', component: ServerMenuView },
     { path: '/addServer', name: 'AddServer', component: AddServerView },
-    { path: '/tool/stringToUnicode', name: 'StringToUnicode', component: StringToUnicodeView }
+    { path: '/tool/stringToUnicode', name: 'StringToUnicode', component: StringToUnicodeView },
+    { path: '/cacheSettings', name: 'CacheSettings', component: CacheSettingsView }
 ]
 
 const router = createRouter({

@@ -41,7 +41,38 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,mp3,mp4}'],
+        // Add runtime caching for media files
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\/file\/private\/.*$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'private-media-files',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          },
+          {
+            urlPattern: /^http:\/\/.*\/file\/private\/.*$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'private-media-files',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
+          }
+        ]
       }
     })
   ],

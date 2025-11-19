@@ -14,11 +14,15 @@ const addServer = async () => {
   router.push('/addServer');
 };
 
+const goToCacheSettings = () => {
+  router.push('/cacheSettings');
+};
 </script>
 
 <template>
   <div class="menu-view">
     <button @click="addServer">添加服务器</button>
+    <button @click="goToCacheSettings">媒体缓存设置</button>
     <div class="setting-div">
       <div class="setting-div-text">分屏宽度</div>
       <input v-model="partitionWidth" type="number">
