@@ -129,7 +129,6 @@ function swapText() {
 
 .container {
   width: 100%;
-  max-width: 50rem;
   background: white;
   border-radius: 0.625rem;
   box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.2);
@@ -137,6 +136,7 @@ function swapText() {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  min-width: 0;
 }
 
 h2 {
