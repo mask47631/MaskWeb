@@ -9,7 +9,7 @@ import GlobalLoading from './components/GlobalLoading.js'
 // 页面刷新时自动跳转到根路径
 // 检查当前路径，如果不是根路径，则重定向到根路径
 router.isReady().then(() => {
-  if (router.currentRoute.value.path !== '/') {
+  if (router.currentRoute.value.path !== '/' && !router.currentRoute.value.path.startsWith('/tool/')) {
     router.push('/');
   }
 });

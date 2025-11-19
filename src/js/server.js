@@ -300,6 +300,7 @@ export class Server {
                  content = JSON.stringify(content)
              }
              const message = {
+                 messageType: 'chat',
                  content: content
              };
              this.stompClient.send("/app/chat", {}, JSON.stringify(message));
