@@ -250,6 +250,7 @@ export class Server {
             });
         }, (error) => {
             console.log('STOMP error: ' + error);
+            this.isconnerting =  false
             this.connected = false;
             // 尝试重连
             this.handleReconnect();
